@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitcoin Improvement Proposals — BIPs</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#000;--black2:#080808;--black3:#0f0f0f;--black4:#141414;
+  --gold:#f7931a;--gold-pale:rgba(247,147,26,0.12);--gold-glow:rgba(247,147,26,0.35);
+  --white:#f0ece4;--white-dim:#8a867e;--white-faint:rgba(240,236,228,0.05);
+  --border:rgba(247,147,26,0.18);--border-dim:rgba(255,255,255,0.06);
+  --deployed:#3fb950;--draft:#58a6ff;--closed:#8b949e;--complete:#a371f7;
+}
+body{background:var(--black);color:var(--white);font-family:'IBM Plex Mono',monospace;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:9999}
+header{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.94);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px}
+.header-left{display:flex;align-items:center;gap:14px}
+.btc-logo{width:32px;height:32px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#000;box-shadow:0 0 14px var(--gold-glow);animation:pulse 2.5s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{box-shadow:0 0 10px rgba(247,147,26,0.3)}50%{box-shadow:0 0 28px rgba(247,147,26,0.7)}}
+.header-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px}
+.header-title span{color:var(--gold)}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.stat-chip{font-size:0.62rem;letter-spacing:1.5px;color:var(--white-dim);border:1px solid var(--border-dim);border-radius:4px;padding:3px 9px}
+.stat-chip b{color:var(--gold)}
+.hero{padding:50px 28px 36px;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
+.hero-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,5vw,4.8rem);line-height:0.95;letter-spacing:2px}
+.hero-heading .line2{color:var(--gold);text-shadow:0 0 40px var(--gold-glow)}
+.hero-sub{margin-top:14px;font-size:0.7rem;color:var(--white-dim);letter-spacing:1.5px;line-height:1.9;max-width:480px}
+.hero-meta{text-align:right;font-size:0.62rem;color:var(--white-dim);letter-spacing:1px;line-height:2.4}
+.hero-meta span{color:var(--gold)}
+.controls{max-width:1280px;margin:0 auto;padding:0 28px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--white-dim);font-size:0.85rem;pointer-events:none}
+input[type=search]{width:100%;background:var(--black3);border:1px solid var(--border-dim);color:var(--white);padding:9px 12px 9px 34px;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:1px;border-radius:5px;outline:none;transition:border-color 0.2s}
+input[type=search]:focus{border-color:var(--gold)}
+input[type=search]::placeholder{color:var(--white-dim)}
+input[type=search]::-webkit-search-cancel-button{display:none}
+.filter-btn{padding:8px 13px;background:var(--black3);border:1px solid var(--border-dim);color:var(--white-dim);font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:1.5px;border-radius:5px;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.filter-btn:hover,.filter-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-pale)}
+.table-wrap{max-width:1280px;margin:0 auto;padding:0 28px 80px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead th{font-size:0.6rem;letter-spacing:2.5px;color:var(--white-dim);text-transform:uppercase;text-align:left;padding:9px 14px;border-bottom:1px solid var(--border);background:var(--black2);cursor:pointer;user-select:none;white-space:nowrap}
+thead th:hover{color:var(--gold)}
+tbody tr{border-bottom:1px solid var(--border-dim);transition:background 0.1s}
+tbody tr:hover{background:var(--white-faint);cursor:pointer}
+td{padding:11px 14px;font-size:0.73rem;vertical-align:middle;line-height:1.4}
+.bip-num{color:var(--gold);font-weight:700;font-size:0.78rem;letter-spacing:1px;white-space:nowrap}
+.bip-title{color:var(--white);max-width:380px}
+.bip-title a{color:inherit;text-decoration:none;transition:color 0.15s}
+.bip-title a:hover{color:var(--gold)}
+.bip-authors{color:var(--white-dim);font-size:0.65rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bip-layer{font-size:0.62rem;letter-spacing:1px;color:var(--white-dim);white-space:nowrap}
+.bip-year{color:var(--white-dim);font-size:0.68rem;white-space:nowrap}
+.status{display:inline-block;padding:2px 8px;border-radius:3px;font-size:0.59rem;letter-spacing:1.5px;font-weight:700;white-space:nowrap}
+.status-Deployed{background:rgba(63,185,80,0.12);color:var(--deployed);border:1px solid rgba(63,185,80,0.3)}
+.status-Draft{background:rgba(88,166,255,0.12);color:var(--draft);border:1px solid rgba(88,166,255,0.3)}
+.status-Closed{background:rgba(139,148,158,0.1);color:var(--closed);border:1px solid rgba(139,148,158,0.2)}
+.status-Complete{background:rgba(163,113,247,0.1);color:var(--complete);border:1px solid rgba(163,113,247,0.25)}
+.type{display:inline-block;padding:2px 7px;border-radius:3px;font-size:0.58rem;letter-spacing:1px;background:var(--black4);border:1px solid var(--border-dim);color:var(--white-dim);white-space:nowrap}
+.empty{text-align:center;padding:70px 20px;color:var(--white-dim);font-size:0.75rem;letter-spacing:2px;display:none}
+footer{border-top:1px solid var(--border-dim);padding:20px 28px;text-align:center;font-size:0.62rem;color:var(--white-dim);letter-spacing:1.5px}
+footer a{color:var(--gold);text-decoration:none}
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.9);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--black3);border:1px solid var(--border);border-radius:10px;max-width:600px;width:100%;max-height:82vh;overflow-y:auto;transform:translateY(18px);transition:transform 0.22s;padding:28px}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-bip{font-size:0.68rem;color:var(--gold);letter-spacing:3px;margin-bottom:5px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;line-height:1.1;margin-bottom:18px}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.modal-field .label{font-size:0.58rem;letter-spacing:2px;color:var(--white-dim);text-transform:uppercase;margin-bottom:4px}
+.modal-field .value{font-size:0.75rem;color:var(--white)}
+.modal-divider{height:1px;background:var(--border-dim);margin:18px 0}
+.modal-abstract{font-size:0.72rem;line-height:1.85;color:var(--white-dim)}
+.modal-link{display:inline-block;margin-top:16px;font-size:0.65rem;color:var(--gold);letter-spacing:2px;text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:4px;transition:all 0.15s}
+.modal-link:hover{background:var(--gold-pale)}
+.modal-close{margin-top:14px;width:100%;padding:9px;background:none;border:1px solid var(--border-dim);color:var(--white-dim);font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:2px;border-radius:5px;cursor:pointer;transition:all 0.15s}
+.modal-close:hover{border-color:var(--gold);color:var(--gold)}
+@media(max-width:768px){header{padding:0 14px}.hero{grid-template-columns:1fr;padding:30px 14px 20px}.hero-meta{text-align:left}.controls,.table-wrap{padding-left:14px;padding-right:14px}.col-authors,.col-layer,.col-year{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-left">
+    <div class="btc-logo">&#x20BF;</div>
+    <div class="header-title">BIP<span>S</span></div>
+  </div>
+  <div class="header-right">
+    <div class="stat-chip">TOTAL <b id="totalCount">-</b></div>
+    <div class="stat-chip">DEPLOYED <b id="deployedCount" style="color:var(--deployed)">-</b></div>
+    <div class="stat-chip">DRAFT <b id="draftCount" style="color:var(--draft)">-</b></div>
+    <div class="stat-chip">COMPLETE <b id="completeCount" style="color:var(--complete)">-</b></div>
+  </div>
+</header>
+<div class="hero">
+  <div>
+    <div class="hero-heading">BITCOIN<br><span class="line2">IMPROVEMENT</span><br>PROPOSALS</div>
+    <p class="hero-sub">Design documents for introducing features, information, and changes to Bitcoin. The standard way of communicating ideas in the absence of a central authority.</p>
+  </div>
+  <div class="hero-meta">
+    <div>GENESIS BLOCK <span>Jan 3, 2009</span></div>
+    <div>FIRST BIP <span>Aug 19, 2011</span></div>
+    <div>SOURCE <span>github.com/bitcoin/bips</span></div>
+  </div>
+</div>
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">&#8981;</span>
+    <input type="search" id="searchInput" placeholder="Search BIP number, title, author, layer...">
+  </div>
+  <button class="filter-btn active" data-filter="all">ALL</button>
+  <button class="filter-btn" data-filter="Deployed">DEPLOYED</button>
+  <button class="filter-btn" data-filter="Draft">DRAFT</button>
+  <button class="filter-btn" data-filter="Complete">COMPLETE</button>
+  <button class="filter-btn" data-filter="Closed">CLOSED</button>
+</div>
+<div class="table-wrap">
+  <table id="bipTable">
+    <thead>
+      <tr>
+        <th data-col="num" class="sorted">BIP <span class="sort-icon">&#8593;</span></th>
+        <th data-col="title">TITLE <span class="sort-icon">&#8645;</span></th>
+        <th data-col="type">TYPE <span class="sort-icon">&#8645;</span></th>
+        <th data-col="status">STATUS <span class="sort-icon">&#8645;</span></th>
+        <th data-col="layer" class="col-layer">LAYER <span class="sort-icon">&#8645;</span></th>
+        <th data-col="authors" class="col-authors">AUTHORS <span class="sort-icon">&#8645;</span></th>
+        <th data-col="year" class="col-year">YEAR <span class="sort-icon">&#8645;</span></th>
+      </tr>
+    </thead>
+    <tbody id="bipBody"></tbody>
+  </table>
+  <div class="empty" id="emptyMsg">NO BIPS FOUND MATCHING YOUR QUERY</div>
+</div>
+<footer>
+  Data sourced from <a href="https://bips.xyz" target="_blank">bips.xyz</a> &amp; <a href="https://github.com/bitcoin/bips" target="_blank">github.com/bitcoin/bips</a> &nbsp;&middot;&nbsp; Not affiliated with Bitcoin Core
+</footer>
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-bip" id="mBip"></div>
+    <div class="modal-title" id="mTitle"></div>
+    <div class="modal-grid">
+      <div class="modal-field"><div class="label">Status</div><div class="value" id="mStatus"></div></div>
+      <div class="modal-field"><div class="label">Type</div><div class="value" id="mType"></div></div>
+      <div class="modal-field"><div class="label">Layer</div><div class="value" id="mLayer"></div></div>
+      <div class="modal-field"><div class="label">Year</div><div class="value" id="mYear"></div></div>
+      <div class="modal-field" style="grid-column:span 2"><div class="label">Authors</div><div class="value" id="mAuthors"></div></div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-abstract" id="mAbstract"></div>
+    <a class="modal-link" id="mLink" href="#" target="_blank">&#8599; VIEW ON BIPS.XYZ</a>
+    <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">&#10005; CLOSE</button>
+  </div>
+</div>
+<script>
+const BIPS=[
+{num:1,title:"BIP Purpose and Guidelines",type:"Process",status:"Closed",layer:"",authors:"Amir Taaki",year:2011,abstract:"BIP stands for Bitcoin Improvement Proposal. Describes what a BIP is, the BIP types (Standards Track, Informational, Process), the workflow, and the lifecycle from Draft to Final."},
+{num:2,title:"BIP Process, Revised",type:"Process",status:"Closed",layer:"",authors:"Luke Dashjr",year:2016,abstract:"Replaces BIP 1. Clarifies the BIP process, types of BIPs, workflow, and criteria for acceptance."},
+{num:3,title:"Updated BIP Process",type:"Process",status:"Deployed",layer:"",authors:"Luke Dashjr",year:2023,abstract:"Further updates to the BIP process document."},
+{num:8,title:"Version bits with lock-in by height",type:"Informational",status:"Draft",layer:"",authors:"Shaolin Fry; Luke Dashjr",year:2017,abstract:"A mechanism for soft fork deployment using version bits, with lock-in triggered by block height instead of median time past."},
+{num:9,title:"Version bits with timeout and delay",type:"Informational",status:"Deployed",layer:"",authors:"Pieter Wuille; Peter Todd; Greg Maxwell; Rusty Russell",year:2015,abstract:"A generalized mechanism for softfork deployment using version bits with a timeout and delay period."},
+{num:10,title:"Multi-Sig Transaction Distribution",type:"Informational",status:"Closed",layer:"Applications",authors:"Alan Reiner",year:2011,abstract:"A protocol for distributing multi-signature transaction data between parties for offline signing."},
+{num:11,title:"M-of-N Standard Transactions",type:"Specification",status:"Deployed",layer:"Applications",authors:"Gavin Andresen",year:2011,abstract:"Standardizes M-of-N multisignature transactions in Bitcoin."},
+{num:12,title:"OP_EVAL",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Gavin Andresen",year:2011,abstract:"Proposed a new opcode OP_EVAL allowing execution of a serialized script. Withdrawn in favor of P2SH."},
+{num:13,title:"Address Format for pay-to-script-hash",type:"Specification",status:"Deployed",layer:"Applications",authors:"Gavin Andresen",year:2011,abstract:"Defines the address format for P2SH transactions using Base58Check encoding with version byte 0x05."},
+{num:14,title:"Protocol Version and User Agent",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Amir Taaki; Patrick Strateman",year:2011,abstract:"Defines a protocol version field and user agent string for Bitcoin network nodes."},
+{num:15,title:"Aliases",type:"Specification",status:"Closed",layer:"Applications",authors:"Amir Taaki",year:2011,abstract:"Proposed a system for human-readable aliases to Bitcoin addresses."},
+{num:16,title:"Pay to Script Hash",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Gavin Andresen",year:2012,abstract:"Defines P2SH — a new transaction type allowing the sender to commit to a script hash. Enables complex scripts without burdening the sender."},
+{num:17,title:"OP_CHECKHASHVERIFY (CHV)",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Luke Dashjr",year:2011,abstract:"Proposed OP_CHECKHASHVERIFY to allow a transaction output to be unspendable unless the transaction meets a predefined hash condition."},
+{num:18,title:"hashScriptCheck",type:"Specification",status:"Complete",layer:"Consensus (soft fork)",authors:"Luke Dashjr",year:2012,abstract:"Proposes new script opcodes for checking script hashes as an alternative approach to P2SH."},
+{num:19,title:"M-of-N Standard Transactions (Low SigOp)",type:"Specification",status:"Closed",layer:"Applications",authors:"Luke Dashjr",year:2012,abstract:"A variant of BIP-11 multisig transactions designed to have a lower signature operation count."},
+{num:20,title:"URI Scheme (legacy)",type:"Specification",status:"Closed",layer:"Applications",authors:"Luke Dashjr",year:2011,abstract:"Early URI scheme proposal for Bitcoin payments. Superseded by BIP-21."},
+{num:21,title:"URI Scheme",type:"Specification",status:"Closed",layer:"Applications",authors:"Nils Schneider; Matt Corallo",year:2012,abstract:"Defines a URI scheme (bitcoin:) for making Bitcoin payments, supporting amount, label, message, and request URL parameters."},
+{num:22,title:"getblocktemplate - Fundamentals",type:"Specification",status:"Deployed",layer:"API/RPC",authors:"Luke Dashjr",year:2012,abstract:"Defines a new JSON-RPC getblocktemplate method for mining, replacing the old getwork method."},
+{num:23,title:"getblocktemplate - Pooled Mining",type:"Specification",status:"Deployed",layer:"API/RPC",authors:"Luke Dashjr",year:2012,abstract:"Extends BIP-22 getblocktemplate to support pooled/stratum mining operations."},
+{num:30,title:"Duplicate transactions",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Pieter Wuille",year:2012,abstract:"Fixes a vulnerability allowing two blocks to contain transactions with the same txid, requiring all transactions to be unique."},
+{num:31,title:"Pong message",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Mike Hearn",year:2012,abstract:"Adds a pong message to the peer-to-peer protocol to respond to ping messages."},
+{num:32,title:"Hierarchical Deterministic Wallets",type:"Informational",status:"Deployed",layer:"Applications",authors:"Pieter Wuille",year:2012,abstract:"Defines a system for deriving a tree of keypairs from a single seed, enabling HD wallets with child key derivation."},
+{num:33,title:"Stratized Nodes",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Amir Taaki",year:2012,abstract:"Proposed a stratified node model for the Bitcoin network to address scalability concerns."},
+{num:34,title:"Block v2, Height in Coinbase",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Gavin Andresen",year:2012,abstract:"Requires version 2 blocks to include the block height in the coinbase transaction to ensure coinbase uniqueness."},
+{num:35,title:"mempool message",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Jeff Garzik",year:2012,abstract:"Adds a mempool message allowing peers to request a list of unconfirmed transactions."},
+{num:36,title:"Custom Services",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Stefan Thomas",year:2012,abstract:"Proposed a custom services field for experimental peer-to-peer messages without a protocol version bump."},
+{num:37,title:"Connection Bloom filtering",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Mike Hearn; Matt Corallo",year:2012,abstract:"Adds probabilistic bloom filtering for lightweight clients (SPV nodes) over the peer-to-peer network."},
+{num:38,title:"Passphrase-protected private key",type:"Specification",status:"Deployed",layer:"Applications",authors:"Mike Caldwell; Aaron Voisine",year:2012,abstract:"Defines a method for encrypting a private key with a passphrase, encoded as a 58-character Base58Check string."},
+{num:39,title:"Mnemonic code for generating deterministic keys",type:"Specification",status:"Deployed",layer:"Applications",authors:"Marek Palatinus; Pavol Rusnak; Aaron Voisine; Sean Bowe",year:2013,abstract:"Defines a mnemonic sentence (seed phrase) of 12-24 words for generating deterministic HD wallet seeds."},
+{num:42,title:"A finite monetary supply for Bitcoin",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Pieter Wuille",year:2014,abstract:"Clarifies and enforces the hard cap of 21 million bitcoin by correcting a potential overflow bug in the original subsidy calculation."},
+{num:43,title:"Purpose Field for Deterministic Wallets",type:"Specification",status:"Deployed",layer:"Applications",authors:"Marek Palatinus; Pavol Rusnak",year:2014,abstract:"Introduces a purpose field in BIP-32 derivation paths (m/purpose') to distinguish different wallet standards."},
+{num:44,title:"Multi-Account Hierarchy for Deterministic Wallets",type:"Specification",status:"Deployed",layer:"Applications",authors:"Marek Palatinus; Pavol Rusnak",year:2014
