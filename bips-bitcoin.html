@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitcoin Improvement Proposals — BIPs</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#000;--black2:#080808;--black3:#0f0f0f;--black4:#141414;
+  --gold:#f7931a;--gold-pale:rgba(247,147,26,0.12);--gold-glow:rgba(247,147,26,0.35);
+  --white:#f0ece4;--white-dim:#8a867e;--white-faint:rgba(240,236,228,0.05);
+  --border:rgba(247,147,26,0.18);--border-dim:rgba(255,255,255,0.06);
+  --deployed:#3fb950;--draft:#58a6ff;--closed:#8b949e;--complete:#a371f7;
+}
+body{background:var(--black);color:var(--white);font-family:'IBM Plex Mono',monospace;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:9999}
+header{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.94);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px}
+.header-left{display:flex;align-items:center;gap:14px}
+.btc-logo{width:32px;height:32px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#000;box-shadow:0 0 14px var(--gold-glow);animation:pulse 2.5s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{box-shadow:0 0 10px rgba(247,147,26,0.3)}50%{box-shadow:0 0 28px rgba(247,147,26,0.7)}}
+.header-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px}
+.header-title span{color:var(--gold)}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.stat-chip{font-size:0.62rem;letter-spacing:1.5px;color:var(--white-dim);border:1px solid var(--border-dim);border-radius:4px;padding:3px 9px}
+.stat-chip b{color:var(--gold)}
+.hero{padding:50px 28px 36px;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
+.hero-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,5vw,4.8rem);line-height:0.95;letter-spacing:2px}
+.hero-heading .line2{color:var(--gold);text-shadow:0 0 40px var(--gold-glow)}
+.hero-sub{margin-top:14px;font-size:0.7rem;color:var(--white-dim);letter-spacing:1.5px;line-height:1.9;max-width:480px}
+.hero-meta{text-align:right;font-size:0.62rem;color:var(--white-dim);letter-spacing:1px;line-height:2.4}
+.hero-meta span{color:var(--gold)}
+.controls{max-width:1280px;margin:0 auto;padding:0 28px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--white-dim);font-size:0.85rem;pointer-events:none}
+input[type=search]{width:100%;background:var(--black3);border:1px solid var(--border-dim);color:var(--white);padding:9px 12px 9px 34px;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:1px;border-radius:5px;outline:none;transition:border-color 0.2s}
+input[type=search]:focus{border-color:var(--gold)}
+input[type=search]::placeholder{color:var(--white-dim)}
+input[type=search]::-webkit-search-cancel-button{display:none}
+.filter-btn{padding:8px 13px;background:var(--black3);border:1px solid var(--border-dim);color:var(--white-dim);font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:1.5px;border-radius:5px;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.filter-btn:hover,.filter-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-pale)}
+.table-wrap{max-width:1280px;margin:0 auto;padding:0 28px 80px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead th{font-size:0.6rem;letter-spacing:2.5px;color:var(--white-dim);text-transform:uppercase;text-align:left;padding:9px 14px;border-bottom:1px solid var(--border);background:var(--black2);cursor:pointer;user-select:none;white-space:nowrap}
+thead th:hover{color:var(--gold)}
+tbody tr{border-bottom:1px solid var(--border-dim);transition:background 0.1s}
+tbody tr:hover{background:var(--white-faint);cursor:pointer}
+td{padding:11px 14px;font-size:0.73rem;vertical-align:middle;line-height:1.4}
+.bip-num{color:var(--gold);font-weight:700;font-size:0.78rem;letter-spacing:1px;white-space:nowrap}
+.bip-title{color:var(--white);max-width:380px}
+.bip-title a{color:inherit;text-decoration:none;transition:color 0.15s}
+.bip-title a:hover{color:var(--gold)}
+.bip-authors{color:var(--white-dim);font-size:0.65rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bip-layer{font-size:0.62rem;letter-spacing:1px;color:var(--white-dim);white-space:nowrap}
+.bip-year{color:var(--white-dim);font-size:0.68rem;white-space:nowrap}
+.status{display:inline-block;padding:2px 8px;border-radius:3px;font-size:0.59rem;letter-spacing:1.5px;font-weight:700;white-space:nowrap}
+.status-Deployed{background:rgba(63,185,80,0.12);color:var(--deployed);border:1px solid rgba(63,185,80,0.3)}
+.status-Draft{background:rgba(88,166,255,0.12);color:var(--draft);border:1px solid rgba(88,166,255,0.3)}
+.status-Closed{background:rgba(139,148,158,0.1);color:var(--closed);border:1px solid rgba(139,148,158,0.2)}
+.status-Complete{background:rgba(163,113,247,0.1);color:var(--complete);border:1px solid rgba(163,113,247,0.25)}
+.type{display:inline-block;padding:2px 7px;border-radius:3px;font-size:0.58rem;letter-spacing:1px;background:var(--black4);border:1px solid var(--border-dim);color:var(--white-dim);white-space:nowrap}
+.empty{text-align:center;padding:70px 20px;color:var(--white-dim);font-size:0.75rem;letter-spacing:2px;display:none}
+footer{border-top:1px solid var(--border-dim);padding:20px 28px;text-align:center;font-size:0.62rem;color:var(--white-dim);letter-spacing:1.5px}
+footer a{color:var(--gold);text-decoration:none}
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.9);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--black3);border:1px solid var(--border);border-radius:10px;max-width:600px;width:100%;max-height:82vh;overflow-y:auto;transform:translateY(18px);transition:transform 0.22s;padding:28px}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-bip{font-size:0.68rem;color:var(--gold);letter-spacing:3px;margin-bottom:5px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;line-height:1.1;margin-bottom:18px}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.modal-field .label{font-size:0.58rem;letter-spacing:2px;color:var(--white-dim);text-transform:uppercase;margin-bottom:4px}
+.modal-field .value{font-size:0.75rem;color:var(--white)}
+.modal-divider{height:1px;background:var(--border-dim);margin:18px 0}
+.modal-abstract{font-size:0.72rem;line-height:1.85;color:var(--white-dim)}
+.modal-link{display:inline-block;margin-top:16px;font-size:0.65rem;color:var(--gold);letter-spacing:2px;text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:4px;transition:all 0.15s}
+.modal-link:hover{background:var(--gold-pale)}
+.modal-close{margin-top:14px;width:100%;padding:9px;background:none;border:1px solid var(--border-dim);color:var(--white-dim);font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:2px;border-radius:5px;cursor:pointer;transition:all 0.15s}
+.modal-close:hover{border-color:var(--gold);color:var(--gold)}
+@media(max-width:768px){header{padding:0 14px}.hero{grid-template-columns:1fr;padding:30px 14px 20px}.hero-meta{text-align:left}.controls,.table-wrap{padding-left:14px;padding-right:14px}.col-authors,.col-layer,.col-year{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-left">
+    <div class="btc-logo">&#x20BF;</div>
+    <div class="header-title">BIP<span>S</span></div>
+  </div>
+  <div class="header-right">
+    <div class="stat-chip">TOTAL <b id="totalCount">-</b></div>
+    <div class="stat-chip">DEPLOYED <b id="deployedCount" style="color:var(--deployed)">-</b></div>
+    <div class="stat-chip">DRAFT <b id="draftCount" style="color:var(--draft)">-</b></div>
+    <div class="stat-chip">COMPLETE <b id="completeCount" style="color:var(--complete)">-</b></div>
+  </div>
+</header>
+<div class="hero">
+  <div>
+    <div class="hero-heading">BITCOIN<br><span class="line2">IMPROVEMENT</span><br>PROPOSALS</div>
+    <p class="hero-sub">Design documents for introducing features, information, and changes to Bitcoin. The standard way of communicating ideas in the absence of a central authority.</p>
+  </div>
+  <div class="hero-meta">
+    <div>GENESIS BLOCK <span>Jan 3, 2009</span></div>
+    <div>FIRST BIP <span>Aug 19, 2011</span></div>
+    <div>SOURCE <span>github.com/bitcoin/bips</span></div>
+  </div>
+</div>
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">&#8981;</span>
+    <input type="search" id="searchInput" placeholder="Search BIP number, title, author, layer...">
+  </div>
+  <button class="filter-btn active" data-filter="all">ALL</button>
+  <button class="filter-btn" data-filter="Deployed">DEPLOYED</button>
+  <button class="filter-btn" data-filter="Draft">DRAFT</button>
+  <button class="filter-btn" data-filter="Complete">COMPLETE</button>
+  <button class="filter-btn" data-filter="Closed">CLOSED</button>
+</div>
+<div class="table-wrap">
+  <table id="bipTable">
+    <thead>
+      <tr>
+        <th data-col="num" class="sorted">BIP <span class="sort-icon">&#8593;</span></th>
+        <th data-col="title">TITLE <span class="sort-icon">&#8645;</span></th>
+        <th data-col="type">TYPE <span class="sort-icon">&#8645;</span></th>
+        <th data-col="status">STATUS <span class="sort-icon">&#8645;</span></th>
+        <th data-col="layer" class="col-layer">LAYER <span class="sort-icon">&#8645;</span></th>
+        <th data-col="authors" class="col-authors">AUTHORS <span class="sort-icon">&#8645;</span></th>
+        <th data-col="year" class="col-year">YEAR <span class="sort-icon">&#8645;</span></th>
+      </tr>
+    </thead>
+    <tbody id="bipBody"></tbody>
+  </table>
+  <div class="empty" id="emptyMsg">NO BIPS FOUND MATCHING YOUR QUERY</div>
+</div>
+<footer>
+  Data sourced from <a href="https://bips.xyz" target="_blank">bips.xyz</a> &amp; <a href="https://github.com/bitcoin/bips" target="_blank">github.com/bitcoin/bips</a> &nbsp;&middot;&nbsp; Not affiliated with Bitcoin Core
+</footer>
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-bip" id="mBip"></div>
+    <div class="modal-title" id="mTitle"></div>
+    <div class="modal-grid">
+      <div class="modal-field"><div class="label">Status</div><div class="value" id="mStatus"></div></div>
+      <div class="modal-field"><div class="label">Type</div><div class="value" id="mType"></div></div>
+      <div class="modal-field"><div class="label">Layer</div><div class="value" id="mLayer"></div></div>
+      <div class="modal-field"><div class="label">Year</div><div class="value" id="mYear"></div></div>
+      <div class="modal-field" style="grid-column:span 2"><div class="label">Authors</div><div class="value" id="mAuthors"></div></div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-abstract" id="mAbstract"></div>
+    <a class="modal-link" id="mLink" href="#" target="_blank">&#8599; VIEW ON BIPS.XYZ</a>
+    <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">&#10005; CLOSE</button>
+  </div>
+</div>
+<script>
+const BIPS=[
+{num:1,title:"BIP Purpose and Guidelines",type:"Process",status:"Closed",layer:"",authors:"Amir Taaki",year:2011,abstract:"BIP stands for Bitcoin Improvement Proposal. Describes what a BIP is, the BIP types (Standards Track, Informational, Process), the workflow, and the lifecycle from Draft to Final."},
+{num:2,title:"BIP Process, Revised",type:"Process",status:"Closed",layer:"",authors:"Luke Dashjr",year:2016,abstract:"Replaces BIP 1. Clarifies the BIP process, types of BIPs, workflow, and criteria for acceptance."},
+{num:3,title:"Updated BIP Process",type:"Process",status:"Deployed",layer:"",authors:"Luke Dashjr",year:2023,abstract:"Further updates to the BIP process document."},
+{num:8,title:"Version bits with lock-in by height",type:"Informational",status:"Draft",layer:"",authors:"Shaolin Fry; Luke Dashjr",year:2017,abstract:"A mechanism for soft fork deployment using version bits, with lock-in triggered by block height instead of median time past."},
+{num:9,title:"Version bits with timeout and delay",type:"Informational",status:"Deployed",layer:"",authors:"Pieter Wuille; Peter Todd; Greg Maxwell; Rusty Russell",year:2015,abstract:"A generalized mechanism for softfork deployment using version bits with a timeout and delay period."},
+{num:10,title:"Multi-Sig Transaction Distribution",type:"Informational",status:"Closed",layer:"Applications",authors:"Alan Reiner",year:2011,abstract:"A protocol for distributing multi-signature transaction data between parties for offline signing."},
+{num:11,title:"M-of-N Standard Transactions",type:"Specification",status:"Deployed",layer:"Applications",authors:"Gavin Andresen",year:2011,abstract:"Standardizes M-of-N multisignature transactions in Bitcoin."},
+{num:12,title:"OP_EVAL",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Gavin Andresen",year:2011,abstract:"Proposed a new opcode OP_EVAL allowing execution of a serialized script. Withdrawn in favor of P2SH."},
+{num:13,title:"Address Format for pay-to-script-hash",type:"Specification",status:"Deployed",layer:"Applications",authors:"Gavin Andresen",year:2011,abstract:"Defines the address format for P2SH transactions using Base58Check encoding with version byte 0x05."},
+{num:14,title:"Protocol Version and User Agent",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Amir Taaki; Patrick Strateman",year:2011,abstract:"Defines a protocol version field and user agent string for Bitcoin network nodes."},
+{num:15,title:"Aliases",type:"Specification",status:"Closed",layer:"Applications",authors:"Amir Taaki",year:2011,abstract:"Proposed a system for human-readable aliases to Bitcoin addresses."},
+{num:16,title:"Pay to Script Hash",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Gavin Andresen",year:2012,abstract:"Defines P2SH — a new transaction type allowing the sender to commit to a script hash. Enables complex scripts without burdening the sender."},
+{num:17,title:"OP_CHECKHASHVERIFY (CHV)",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Luke Dashjr",year:2011,abstract:"Proposed OP_CHECKHASHVERIFY to allow a transaction output to be unspendable unless the transaction meets a predefined hash condition."},
+{num:18,title:"hashScriptCheck",type:"Specification",status:"Complete",layer:"Consensus (soft fork)",authors:"Luke Dashjr",year:2012,abstract:"Proposes new script opcodes for checking script hashes as an alternative approach to P2SH."},
+{num:19,title:"M-of-N Standard Transactions (Low SigOp)",type:"Specification",status:"Closed",layer:"Applications",authors:"Luke Dashjr",year:2012,abstract:"A variant of BIP-11 multisig transactions designed to have a lower signature operation count."},
+{num:20,title:"URI Scheme (legacy)",type:"Specification",status:"Closed",layer:"Applications",authors:"Luke Dashjr",year:2011,abstract:"Early URI scheme proposal for Bitcoin payments. Superseded by BIP-21."},
+{num:21,title:"URI Scheme",type:"Specification",status:"Closed",layer:"Applications",authors:"Nils Schneider; Matt Corallo",year:2012,abstract:"Defines a URI scheme (bitcoin:) for making Bitcoin payments, supporting amount, label, message, and request URL parameters."},
+{num:22,title:"getblocktemplate - Fundamentals",type:"Specification",status:"Deployed",layer:"API/RPC",authors:"Luke Dashjr",year:2012,abstract:"Defines a new JSON-RPC getblocktemplate method for mining, replacing the old getwork method."},
+{num:23,title:"getblocktemplate - Pooled Mining",type:"Specification",status:"Deployed",layer:"API/RPC",authors:"Luke Dashjr",year:2012,abstract:"Extends BIP-22 getblocktemplate to support pooled/stratum mining operations."},
+{num:30,title:"Duplicate transactions",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Pieter Wuille",year:2012,abstract:"Fixes a vulnerability allowing two blocks to contain transactions with the same txid, requiring all transactions to be unique."},
+{num:31,title:"Pong message",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Mike Hearn",year:2012,abstract:"Adds a pong message to the peer-to-peer protocol to respond to ping messages."},
+{num:32,title:"Hierarchical Deterministic Wallets",type:"Informational",status:"Deployed",layer:"Applications",authors:"Pieter Wuille",year:2012,abstract:"Defines a system for deriving a tree of keypairs from a single seed, enabling HD wallets with child key derivation."},
+{num:33,title:"Stratized Nodes",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Amir Taaki",year:2012,abstract:"Proposed a stratified node model for the Bitcoin network to address scalability concerns."},
+{num:34,title:"Block v2, Height in Coinbase",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Gavin Andresen",year:2012,abstract:"Requires version 2 blocks to include the block height in the coinbase transaction to ensure coinbase uniqueness."},
+{num:35,title:"mempool message",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Jeff Garzik",year:2012,abstract:"Adds a mempool message allowing peers to request a list of unconfirmed transactions."},
+{num:36,title:"Custom Services",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Stefan Thomas",year:2012,abstract:"Proposed a custom services field for experimental peer-to-peer messages without a protocol version bump."},
+{num:37,title:"Connection Bloom filtering",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Mike Hearn; Matt Corallo",year:2012,abstract:"Adds probabilistic bloom filtering for lightweight clients (SPV nodes) over the peer-to-peer network."},
+{num:38,title:"Passphrase-protected private key",type:"Specification",status:"Deployed",layer:"Applications",authors:"Mike Caldwell; Aaron Voisine",year:2012,abstract:"Defines a method for encrypting a private key with a passphrase, encoded as a 58-character Base58Check string."},
+{num:39,title:"Mnemonic code for generating deterministic keys",type:"Specification",status:"Deployed",layer:"Applications",authors:"Marek Palatinus; Pavol Rusnak; Aaron Voisine; Sean Bowe",year:2013,abstract:"Defines a mnemonic sentence (seed phrase) of 12-24 words for generating deterministic HD wallet seeds."},
+{num:42,title:"A finite monetary supply for Bitcoin",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Pieter Wuille",year:2014,abstract:"Clarifies and enforces the hard cap of 21 million bitcoin by correcting a potential overflow bug in the original subsidy calculation."},
+{num:43,title:"Purpose Field for Deterministic Wallets",type:"Specification",status:"Deployed",layer:"Applications",authors:"Marek Palatinus; Pavol Rusnak",year:2014,abstract:"Introduces a purpose field in BIP-32 derivation paths (m/purpose') to distinguish different wallet standards."},
+{num:44,title:"Multi-Account Hierarchy for Deterministic Wallets",type:"Specification",status:"Deployed",layer:"Applications",authors:"Marek Palatinus; Pavol Rusnak",year:2014,abstract:"Defines a logical hierarchy for deterministic wallets using BIP-32 and BIP-43, covering accounts, external/internal chains."},
+{num:45,title:"Structure for Deterministic P2SH Multisignature Wallets",type:"Specification",status:"Complete",layer:"Applications",authors:"Manuel Araoz; Ryan X. Charles; Matias Alejo Garcia",year:2014,abstract:"Defines a structure for HD P2SH multisig wallets enabling compatible wallet recovery across implementations."},
+{num:46,title:"Address Scheme for Timelocked Fidelity Bonds",type:"Specification",status:"Draft",layer:"Applications",authors:"Chris Belcher",year:2020,abstract:"Defines an address scheme for fidelity bonds — timelocked UTXOs used to prove sacrifice of Bitcoin time-value in JoinMarket."},
+{num:47,title:"Reusable Payment Codes for HD Wallets",type:"Informational",status:"Deployed",layer:"Applications",authors:"Justus Ranvier",year:2015,abstract:"Defines reusable payment codes (stealth addresses) for HD wallets enabling privacy-preserving payment without address reuse."},
+{num:48,title:"Multi-Script Hierarchy for Multi-Sig Wallets",type:"Specification",status:"Deployed",layer:"Applications",authors:"Fontaine",year:2020,abstract:"Extends the BIP-44 hierarchy with a script-type level for multisig wallets supporting multiple script types."},
+{num:49,title:"Derivation scheme for P2WPKH-nested-in-P2SH",type:"Specification",status:"Deployed",layer:"Applications",authors:"Daniel Weigl",year:2016,abstract:"Defines a BIP-44-compatible derivation scheme for P2SH-P2WPKH (wrapped SegWit) accounts using purpose 49'."},
+{num:50,title:"March 2013 Chain Fork Post-Mortem",type:"Informational",status:"Deployed",layer:"",authors:"Gavin Andresen",year:2013,abstract:"Documents the March 2013 accidental chain fork caused by a BerkeleyDB lock limit bug and the coordinated recovery response."},
+{num:52,title:"Durable, Low Energy Bitcoin PoW",type:"Specification",status:"Draft",layer:"Consensus (hard fork)",authors:"Tier Nolan",year:2021,abstract:"Proposes an alternative proof-of-work function designed to be more durable and energy-efficient than SHA-256d."},
+{num:53,title:"Disallow 64-byte transactions",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Chris Stewart",year:2023,abstract:"Proposes disallowing 64-byte transactions to prevent Merkle tree inner node confusion vulnerabilities."},
+{num:54,title:"Consensus Cleanup",type:"Specification",status:"Complete",layer:"Consensus (soft fork)",authors:"Matt Corallo",year:2019,abstract:"Proposes fixes for several known consensus bugs including the time-warp attack, Merkle tree vulnerabilities, and quadratic sighash."},
+{num:60,title:"Fixed Length Version Message (Relay-Transactions Field)",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Amir Taaki",year:2013,abstract:"Proposed a fixed-length version message for the Bitcoin P2P protocol including a relay-transactions field."},
+{num:61,title:"Reject P2P message",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Gavin Andresen",year:2014,abstract:"Adds a reject message to the Bitcoin P2P protocol for nodes to notify peers why a message was rejected."},
+{num:62,title:"Dealing with malleability",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Pieter Wuille",year:2014,abstract:"Proposed transaction validity rules to eliminate unintentional transaction malleability vectors. Superseded by SegWit."},
+{num:64,title:"getutxo message",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Mike Hearn",year:2014,abstract:"Proposed a getutxo message allowing nodes to query UTXO data from peers without downloading full blocks."},
+{num:65,title:"OP_CHECKLOCKTIMEVERIFY",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Peter Todd",year:2014,abstract:"Introduces the OP_CHECKLOCKTIMEVERIFY (CLTV) opcode making outputs unspendable until a specified block height or time."},
+{num:66,title:"Strict DER signatures",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Pieter Wuille",year:2015,abstract:"Enforces strict DER encoding for all ECDSA signatures in Bitcoin scripts, removing a malleability vector."},
+{num:67,title:"Deterministic Pay-to-script-hash multi-signature addresses",type:"Specification",status:"Complete",layer:"Applications",authors:"Thomas Kerin; Jean-Pierre Rupp; Ruben de Vries",year:2015,abstract:"Defines a deterministic key-ordering method for multisig P2SH addresses ensuring consistent address generation across wallets."},
+{num:68,title:"Relative lock-time using consensus-enforced sequence numbers",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Mark Friedenbach; BtcDrak; Nicolas Dorier; kinoshitajona",year:2015,abstract:"Defines relative lock-time semantics for the nSequence field, enabling outputs spendable only after a relative block/time delay."},
+{num:69,title:"Lexicographical Indexing of Transaction Inputs and Outputs",type:"Informational",status:"Complete",layer:"Applications",authors:"Kristov Atlas",year:2015,abstract:"Recommends lexicographical ordering for transaction inputs and outputs to improve privacy and reduce fingerprinting."},
+{num:70,title:"Payment Protocol",type:"Specification",status:"Deployed",layer:"Applications",authors:"Gavin Andresen; Mike Hearn",year:2013,abstract:"Defines a payment request/response protocol using protocol buffers between merchants and customers."},
+{num:71,title:"Payment Protocol MIME types",type:"Specification",status:"Deployed",layer:"Applications",authors:"Gavin Andresen",year:2013,abstract:"Defines the MIME types for BIP-70 PaymentRequest, Payment, and PaymentACK messages."},
+{num:72,title:"bitcoin: URI extensions for Payment Protocol",type:"Specification",status:"Deployed",layer:"Applications",authors:"Gavin Andresen",year:2013,abstract:"Extends BIP-21 bitcoin: URIs with a 'r' parameter pointing to a BIP-70 PaymentRequest URL."},
+{num:73,title:"Use Accept header with Payment Request URLs",type:"Specification",status:"Deployed",layer:"Applications",authors:"Stephen Pair",year:2013,abstract:"Recommends using HTTP Accept headers when fetching BIP-70 payment requests for content negotiation."},
+{num:74,title:"Allow zero value OP_RETURN in Payment Protocol",type:"Specification",status:"Closed",layer:"Applications",authors:"Toby Padilla",year:2014,abstract:"Proposed allowing zero-value OP_RETURN outputs in the BIP-70 payment protocol for metadata embedding."},
+{num:75,title:"Out of Band Address Exchange using Payment Protocol Encryption",type:"Specification",status:"Deployed",layer:"Applications",authors:"Justin Newton; Matt David; Aaron Voisine; Michael Schloh von Bennewitz",year:2015,abstract:"Defines out-of-band exchange of payment information using BIP-70 encryption for privacy."},
+{num:77,title:"Async Payjoin",type:"Specification",status:"Draft",layer:"Applications",authors:"Dan Gould",year:2023,abstract:"Proposes an asynchronous version of payjoin that works without simultaneous online presence of both parties."},
+{num:78,title:"A Simple Payjoin Proposal",type:"Specification",status:"Deployed",layer:"Applications",authors:"Nicolas Dorier; Kukks; Andrew Camilleri; Thaddeus Dryja",year:2020,abstract:"Defines a simple payjoin (P2EP) protocol combining sender and receiver inputs to break common input ownership heuristics."},
+{num:79,title:"Bustapay: a practical payment batching scheme",type:"Informational",status:"Closed",layer:"Applications",authors:"Ryan Havar",year:2018,abstract:"Proposed Bustapay as a practical payjoin-style payment scheme. Superseded by BIP-78."},
+{num:80,title:"Hierarchy for Non-Colored Voting Pool Deterministic Multisig Wallets",type:"Informational",status:"Closed",layer:"",authors:"Justus Ranvier; Jimmy Song",year:2014,abstract:"Describes an HD hierarchy for voting pool deterministic multisig wallets."},
+{num:81,title:"Hierarchy for Colored Voting Pool Deterministic Multisig Wallets",type:"Informational",status:"Closed",layer:"",authors:"Justus Ranvier; Jimmy Song",year:2014,abstract:"Describes an HD hierarchy for colored coin voting pool deterministic multisig wallets."},
+{num:83,title:"Dynamic Hierarchical Deterministic Key Trees",type:"Specification",status:"Closed",layer:"Applications",authors:"Eric Lombrozo",year:2015,abstract:"Proposes extensions to BIP-32 to allow derivation of dynamic key trees for more flexible wallet structures."},
+{num:84,title:"Derivation scheme for P2WPKH based accounts",type:"Specification",status:"Deployed",layer:"Applications",authors:"Pavol Rusnak",year:2017,abstract:"Defines a BIP-44-compatible derivation path (m/84') for native SegWit P2WPKH (bech32) accounts."},
+{num:85,title:"Deterministic Entropy From BIP32 Keychains",type:"Informational",status:"Deployed",layer:"Applications",authors:"Ethan Kosakovsky",year:2020,abstract:"Defines a method to deterministically derive entropy from a BIP-32 HD wallet keychain for generating other secrets."},
+{num:86,title:"Key Derivation for Single Key P2TR Outputs",type:"Specification",status:"Deployed",layer:"Applications",authors:"Ava Chow",year:2021,abstract:"Defines a BIP-44-compatible derivation path (m/86') for single-key Taproot P2TR outputs."},
+{num:87,title:"Hierarchy for Deterministic Multisig Wallets",type:"Specification",status:"Complete",layer:"Applications",authors:"Robert Spigler",year:2020,abstract:"Defines a standardized HD key hierarchy for multisig wallets compatible with BIP-48."},
+{num:88,title:"Hierarchical Deterministic Path Templates",type:"Informational",status:"Complete",layer:"Applications",authors:"Dmitry Petukhov",year:2020,abstract:"Defines a template language for expressing valid BIP-32 derivation paths with ranges and constraints."},
+{num:89,title:"Chain Code Delegation",type:"Specification",status:"Draft",layer:"Applications",authors:"Jonas Schnelli",year:2021,abstract:"Proposes a method for delegating access to specific HD wallet branches using chain code delegation."},
+{num:90,title:"Buried Deployments",type:"Informational",status:"Deployed",layer:"",authors:"Suhas Daftuar",year:2016,abstract:"Defines a mechanism to activate soft forks retroactively as buried deployments, simplifying future soft fork logic."},
+{num:91,title:"Reduced threshold Segwit MASF",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"James Hilliard",year:2017,abstract:"Specifies a method to activate SegWit via MASF with a reduced 80% threshold before the BIP-141 timeout."},
+{num:93,title:"codex32: Checksummed SSSS-aware BIP32 seeds",type:"Informational",status:"Draft",layer:"Applications",authors:"Leon Olsson Curr; Pearlwort Sneed; Andrew Poelstra",year:2023,abstract:"Defines codex32, a scheme for encoding and checksumming BIP-32 seeds using Shamir's Secret Sharing Scheme."},
+{num:94,title:"Testnet 4",type:"Specification",status:"Deployed",layer:"Applications",authors:"Fabian Jahr",year:2024,abstract:"Defines Testnet 4, a new Bitcoin test network that fixes the time-warp vulnerability present in Testnet 3."},
+{num:98,title:"Fast Merkle Trees",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Mark Friedenbach",year:2017,abstract:"Proposes a fast Merkle tree scheme for use in Bitcoin transactions and blocks with improved security properties."},
+{num:99,title:"Motivation and deployment of consensus rule changes",type:"Informational",status:"Closed",layer:"",authors:"Jorge Timon",year:2015,abstract:"Provides a framework for understanding and categorizing soft and hard fork consensus rule changes."},
+{num:100,title:"Dynamic maximum block size by miner vote",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"Jeff Garzik",year:2015,abstract:"Proposed letting miners vote on the block size limit dynamically through a coinbase voting mechanism."},
+{num:101,title:"Increase maximum block size",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"Gavin Andresen",year:2015,abstract:"Proposed raising the maximum block size to 8MB, doubling every two years. Withdrawn due to lack of consensus."},
+{num:102,title:"Block size increase to 2MB",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"Jeff Garzik",year:2015,abstract:"Proposed a straightforward increase to a 2MB block size limit."},
+{num:103,title:"Block size following technological growth",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"Pieter Wuille",year:2015,abstract:"Proposed a block size limit that scales with technological improvements over time."},
+{num:104,title:"Block75 - Max block size like difficulty",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"t.khan",year:2015,abstract:"Proposed a block size adjustment algorithm analogous to Bitcoin's difficulty adjustment targeting 75% full blocks."},
+{num:105,title:"Consensus based block size retargeting algorithm",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"BtcDrak",year:2015,abstract:"Proposed a consensus-based algorithm for dynamically adjusting the maximum block size."},
+{num:106,title:"Dynamically Controlled Bitcoin Block Size Max Cap",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"Upal Chakraborty",year:2015,abstract:"Proposed an algorithm for dynamically controlling the maximum block size cap based on transaction demand."},
+{num:107,title:"Dynamic limit on the block size",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"Washington Y. Sanchez",year:2015,abstract:"Proposed a dynamic block size limit based on transaction volume and orphan rate."},
+{num:109,title:"Two million byte size limit with sigop and sighash limits",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"Gavin Andresen",year:2016,abstract:"Proposed a 2MB block size limit with additional limits on signature operations and sighash bytes per block."},
+{num:110,title:"Reduced Data Temporary Softfork",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"jl2012",year:2017,abstract:"Proposes a temporary softfork to reduce the maximum amount of data per transaction as a safety measure during stress periods."},
+{num:111,title:"NODE_BLOOM service bit",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Matt Corallo; Peter Todd",year:2015,abstract:"Defines a service bit (NODE_BLOOM) for nodes to advertise support for bloom filtering as defined in BIP-37."},
+{num:112,title:"CHECKSEQUENCEVERIFY",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"BtcDrak; Mark Friedenbach; Eric Lombrozo",year:2015,abstract:"Introduces the OP_CHECKSEQUENCEVERIFY opcode enabling relative time locks in Bitcoin scripts for payment channels."},
+{num:113,title:"Median time-past as endpoint for lock-time calculations",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Thomas Kerin; Mark Friedenbach",year:2015,abstract:"Uses median time-past (MTP) for lock-time calculations, preventing miner manipulation of transaction lock times."},
+{num:114,title:"Merkelized Abstract Syntax Tree",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Johnson Lau",year:2016,abstract:"Proposed MAST to compress Bitcoin scripts and reveal only executed branches. Concepts incorporated into Taproot (BIP-341)."},
+{num:115,title:"Generic anti-replay protection using Script",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Luke Dashjr",year:2016,abstract:"Proposed a generic anti-replay protection mechanism using Bitcoin Script for hard fork scenarios."},
+{num:116,title:"MERKLEBRANCHVERIFY",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Mark Friedenbach; Kalle Alm; BtcDrak",year:2017,abstract:"Adds a MERKLEBRANCHVERIFY opcode to verify inclusion of values in a Merkle tree within Bitcoin Script."},
+{num:117,title:"Tail Call Execution Semantics",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Mark Friedenbach",year:2017,abstract:"Proposes tail call execution semantics for Bitcoin Script enabling script reuse and MAST-like compression."},
+{num:118,title:"SIGHASH_ANYPREVOUT for Taproot Scripts",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Christian Decker; Anthony Towns",year:2017,abstract:"Introduces a new sighash type SIGHASH_ANYPREVOUT enabling signatures not bound to a specific prevout, enabling eltoo payment channels."},
+{num:119,title:"CHECKTEMPLATEVERIFY",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Jeremy Rubin",year:2020,abstract:"Adds OP_CHECKTEMPLATEVERIFY opcode for congestion control, covenants, vaults, and payment channel factories."},
+{num:120,title:"Proof of Payment",type:"Specification",status:"Closed",layer:"Applications",authors:"Kalle Rosenbaum",year:2015,abstract:"Defines a protocol for proving that a specific Bitcoin payment has been made, useful for receipt systems."},
+{num:121,title:"Proof of Payment URI scheme",type:"Specification",status:"Closed",layer:"Applications",authors:"Kalle Rosenbaum",year:2015,abstract:"Defines a URI scheme for Proof of Payment requests as a companion to BIP-120."},
+{num:122,title:"URI scheme for Blockchain references / exploration",type:"Specification",status:"Draft",layer:"Applications",authors:"Marco Pontello",year:2015,abstract:"Defines a URI scheme for referencing blocks, transactions, and addresses on the Bitcoin blockchain."},
+{num:123,title:"BIP Classification",type:"Process",status:"Deployed",layer:"",authors:"Eric Lombrozo",year:2015,abstract:"Defines a classification system for BIPs into Standards Track, Informational, and Process categories."},
+{num:124,title:"Hierarchical Deterministic Script Templates",type:"Informational",status:"Closed",layer:"Applications",authors:"Eric Lombrozo; William Swanson",year:2015,abstract:"Describes hierarchical deterministic script templates for HD wallets."},
+{num:125,title:"Opt-in Full Replace-by-Fee Signaling",type:"Specification",status:"Deployed",layer:"Applications",authors:"David A. Harding; Peter Todd",year:2015,abstract:"Defines opt-in Replace-by-Fee (RBF) signaling via the nSequence field, allowing transaction fee bumping."},
+{num:126,title:"Best Practices for Heterogeneous Input Script Transactions",type:"Informational",status:"Draft",layer:"",authors:"Kristov Atlas",year:2015,abstract:"Provides best practices for handling multiple script types in a single transaction."},
+{num:127,title:"Simple Proof-of-Reserves Transactions",type:"Specification",status:"Complete",layer:"Applications",authors:"Steven Roose",year:2019,abstract:"Defines a standard for Bitcoin exchanges to prove reserves using a specially constructed transaction."},
+{num:128,title:"Timelock-Recovery Storage Format",type:"Specification",status:"Draft",layer:"Applications",authors:"John Cantrell",year:2023,abstract:"Defines a storage format for timelocked recovery scripts for Bitcoin wallets."},
+{num:129,title:"Bitcoin Secure Multisig Setup (BSMS)",type:"Specification",status:"Complete",layer:"Applications",authors:"Hugo Nguyen; Peter D; Akio Nakamura; Craig Raw",year:2021,abstract:"Defines a secure, standardized process for setting up multisig wallets across multiple hardware signers."},
+{num:130,title:"sendheaders message",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Suhas Daftuar",year:2015,abstract:"Adds a sendheaders message allowing nodes to request headers-first block announcement from peers."},
+{num:131,title:"Coalescing Transaction Specification (wildcard inputs)",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"Chris Priest",year:2015,abstract:"Proposed wildcard inputs allowing a transaction to claim all outputs to a given address."},
+{num:132,title:"Committee-based BIP Acceptance Process",type:"Process",status:"Closed",layer:"",authors:"Andy Chase",year:2015,abstract:"Proposed a committee-based process for BIP acceptance decisions."},
+{num:133,title:"feefilter message",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Alex Morcos",year:2016,abstract:"Adds a feefilter message allowing nodes to communicate their minimum fee rate for relaying transactions."},
+{num:134,title:"Flexible Transactions",type:"Specification",status:"Closed",layer:"Consensus (hard fork)",authors:"Tom Zander",year:2016,abstract:"Proposed a new flexible transaction format for Bitcoin with extensible fields."},
+{num:135,title:"Generalized version bits voting",type:"Informational",status:"Closed",layer:"",authors:"Sancho Panza",year:2017,abstract:"A generalized extension of BIP-9 version bits for soft fork signaling with more flexibility."},
+{num:136,title:"Bech32 Encoded Tx Position References",type:"Informational",status:"Draft",layer:"Applications",authors:"Велько Хаvdzy",year:2017,abstract:"Defines a Bech32-encoded scheme for referencing transaction positions in the blockchain."},
+{num:137,title:"Signatures of Messages using Private Keys",type:"Specification",status:"Deployed",layer:"Applications",authors:"Christopher Gilliard",year:2019,abstract:"A standard for signing arbitrary messages with Bitcoin private keys for legacy P2PKH addresses."},
+{num:140,title:"Normalized TXID",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Christian Decker",year:2015,abstract:"Proposed a normalized transaction ID to fix transaction malleability. Superseded by SegWit (BIP-141)."},
+{num:141,title:"Segregated Witness (Consensus layer)",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Eric Lombrozo; Johnson Lau; Pieter Wuille",year:2015,abstract:"Defines Segregated Witness — separating witness data from transaction data, fixing malleability, enabling second-layer protocols like Lightning."},
+{num:142,title:"Address Format for Segregated Witness",type:"Specification",status:"Closed",layer:"Applications",authors:"Johnson Lau",year:2015,abstract:"Proposed an address format for SegWit outputs. Superseded by BIP-173 (Bech32)."},
+{num:143,title:"Transaction Signature Verification for Version 0 Witness Program",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Johnson Lau; Pieter Wuille",year:2016,abstract:"Defines the transaction digest algorithm for SegWit version 0 (P2WPKH and P2WSH) fixing quadratic sighash."},
+{num:144,title:"Segregated Witness (Peer Services)",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Eric Lombrozo; Pieter Wuille",year:2016,abstract:"Defines new P2P messages and serialization formats for communicating SegWit transactions between nodes."},
+{num:145,title:"getblocktemplate Updates for Segregated Witness",type:"Specification",status:"Deployed",layer:"API/RPC",authors:"Luke Dashjr",year:2016,abstract:"Updates the getblocktemplate RPC method to support SegWit blocks and witness data for miners."},
+{num:146,title:"Dealing with signature encoding malleability",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Johnson Lau; Pieter Wuille",year:2016,abstract:"Proposed requiring low-s values and strict DER encoding for all signatures. Partially superseded by BIP-66."},
+{num:147,title:"Dealing with dummy stack element malleability",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Johnson Lau",year:2016,abstract:"Eliminates the dummy stack element malleability vector in OP_CHECKMULTISIG by requiring a null dummy element."},
+{num:148,title:"Mandatory activation of segwit deployment",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Shaolin Fry",year:2017,abstract:"UASF: requires nodes to reject blocks that do not signal SegWit readiness (BIP9 bit 1) after August 1, 2017."},
+{num:149,title:"Segregated Witness (second deployment)",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Shaolin Fry",year:2017,abstract:"A second deployment attempt for SegWit activation via BIP-8, independent of miner signaling."},
+{num:150,title:"Peer Authentication",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Jonas Schnelli",year:2016,abstract:"Defines a cryptographic peer authentication protocol for Bitcoin nodes to verify peer identity."},
+{num:151,title:"Peer-to-Peer Communication Encryption",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Jonas Schnelli",year:2016,abstract:"Proposed encryption for Bitcoin P2P communication. Superseded by BIP-324 (v2 transport)."},
+{num:152,title:"Compact Block Relay",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Matt Corallo",year:2016,abstract:"Defines compact block relay to reduce bandwidth and latency during block propagation using short transaction IDs."},
+{num:154,title:"Rate Limiting via peer specified challenges",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Karl-Johan Alm",year:2019,abstract:"Proposed a rate-limiting mechanism for Bitcoin peers using cryptographic proof-of-work challenges."},
+{num:155,title:"addrv2 message",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Wladimir J. van der Laan",year:2019,abstract:"Defines an addrv2 message extending addr to support longer addresses including Tor v3, I2P, and CJDNS."},
+{num:156,title:"Dandelion - Privacy Enhancing Routing",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Brad Denby; Andrew Miller",year:2018,abstract:"Proposed the Dandelion protocol to improve transaction origin privacy during P2P propagation."},
+{num:157,title:"Client Side Block Filtering",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Olaoluwa Osuntokun; Alex Akselrod; Jim Posen",year:2017,abstract:"Defines compact block filters for lightweight clients to determine wallet relevance without downloading full blocks."},
+{num:158,title:"Compact Block Filters for Light Clients",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Olaoluwa Osuntokun; Alex Akselrod",year:2017,abstract:"Defines the Golomb-coded set (GCS) filter structure and filter types used by BIP-157."},
+{num:159,title:"NODE_NETWORK_LIMITED service bit",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Jonas Schnelli",year:2018,abstract:"Defines a service bit signaling that a node only serves a limited number of recent blocks (pruned nodes)."},
+{num:171,title:"Currency/exchange rate information API",type:"Specification",status:"Closed",layer:"Applications",authors:"Luke Dashjr",year:2012,abstract:"Proposed an API for fetching currency and Bitcoin exchange rate information."},
+{num:172,title:"Define Bitcoin Subunits as Satoshis",type:"Informational",status:"Draft",layer:"Applications",authors:"Jack Mallers",year:2021,abstract:"Proposes formally defining 'satoshi' (sat) as the base unit of Bitcoin (1 BTC = 100,000,000 satoshis)."},
+{num:173,title:"Base32 address format for native v0-16 witness outputs",type:"Informational",status:"Deployed",layer:"Applications",authors:"Pieter Wuille; Greg Maxwell",year:2017,abstract:"Defines Bech32 — the native SegWit address format using base32 encoding with checksums and improved error detection."},
+{num:174,title:"Partially Signed Bitcoin Transaction Format",type:"Specification",status:"Deployed",layer:"Applications",authors:"Andrew Chow",year:2017,abstract:"Defines PSBT, a format for unsigned or partially signed transactions enabling multisig and hardware wallet workflows."},
+{num:175,title:"Pay to Contract Protocol",type:"Informational",status:"Closed",layer:"Applications",authors:"Omar Shibli; Nicholas Gregory",year:2017,abstract:"Describes a protocol for embedding contract commitment data into Bitcoin public keys (pay-to-contract)."},
+{num:176,title:"Bits Denomination",type:"Informational",status:"Complete",layer:"",authors:"Jimmy Song",year:2017,abstract:"Proposes 'bits' as a denomination (1 bit = 100 satoshis = 0.000001 BTC) for everyday Bitcoin amounts."},
+{num:177,title:"Redefine Bitcoin's Base Unit",type:"Informational",status:"Draft",layer:"",authors:"John Light",year:2022,abstract:"Proposes redefining the base unit of Bitcoin to be the satoshi in all user-facing applications."},
+{num:178,title:"Version Extended WIF",type:"Specification",status:"Draft",layer:"Applications",authors:"Karl-Johan Alm",year:2018,abstract:"Extends Wallet Import Format (WIF) with a version byte to indicate the intended script type for the private key."},
+{num:179,title:"Name for payment recipient identifiers",type:"Informational",status:"Draft",layer:"",authors:"Riccardo Casatta; Stepan Snigirev",year:2019,abstract:"Proposes the term 'invoice' as the standard name for Bitcoin payment recipient identifiers."},
+{num:180,title:"Block size/weight fraud proof",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Luke Dashjr",year:2017,abstract:"Proposed fraud proofs for block size and weight limit violations for SPV node verification."},
+{num:197,title:"Hashed Time-Locked Collateral Contract",type:"Specification",status:"Draft",layer:"Applications",authors:"Matthew Black; Tony Cai",year:2019,abstract:"Defines hash time-locked collateral contracts (HTLCCs) for collateralized Bitcoin loans on-chain."},
+{num:199,title:"Hashed Time-Locked Contract transactions",type:"Specification",status:"Closed",layer:"Applications",authors:"Sean Bowe; Daira Hopwood",year:2017,abstract:"Defines a standard script template for Hash Time-Locked Contracts (HTLCs) used in payment channels and atomic swaps."},
+{num:300,title:"Hashrate Escrows (Drivechain Consensus layer)",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Paul Sztorc; CryptAxe",year:2017,abstract:"Proposes hashrate escrows enabling Bitcoin sidechains via a drivechain mechanism at the consensus layer."},
+{num:301,title:"Blind Merged Mining (Drivechain Consensus layer)",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Paul Sztorc; CryptAxe",year:2017,abstract:"Proposes blind merged mining for drivechain sidechains without requiring miners to know sidechain data."},
+{num:310,title:"Stratum protocol extensions",type:"Informational",status:"Draft",layer:"Applications",authors:"marek; slush",year:2018,abstract:"Defines standard extensions to the Stratum v1 mining protocol used by mining pools."},
+{num:320,title:"nVersion bits for general purpose use",type:"Specification",status:"Draft",layer:"",authors:"BtcDrak",year:2015,abstract:"Reserves specific bits of the block version field for miner-signaling general purpose use without BIP-9 activation."},
+{num:321,title:"Payment URI Scheme",type:"Specification",status:"Complete",layer:"Applications",authors:"Kevin Loaec; Antoine Poinsot",year:2021,abstract:"Defines an updated URI scheme for Bitcoin payments compatible with modern script types including bech32."},
+{num:322,title:"Generic Signed Message Format",type:"Specification",status:"Complete",layer:"Applications",authors:"Karl-Johan Alm",year:2018,abstract:"A standard for signing arbitrary messages with any Bitcoin address type (P2PKH, P2WPKH, P2TR, etc.)."},
+{num:323,title:"24 nVersion bits for general purpose use",type:"Specification",status:"Draft",layer:"",authors:"Gloria Zhao",year:2022,abstract:"Proposes extending miner-signaling nVersion bits to 24 bits for general purpose use."},
+{num:324,title:"Version 2 P2P Encrypted Transport Protocol",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Dhruv Mehta; Tim Ruffing; Jonas Schnelli; Pieter Wuille",year:2019,abstract:"Defines BIP-324 v2 encrypted transport — an encrypted and authenticated P2P protocol using ECDH key exchange and ChaCha20Poly1305."},
+{num:325,title:"Signet",type:"Specification",status:"Complete",layer:"Applications",authors:"Karl-Johan Alm; Anthony Towns",year:2019,abstract:"Defines Signet — a test network with blocks signed by a trusted party, providing a more stable and controlled testing environment."},
+{num:326,title:"Anti-fee-sniping in taproot transactions",type:"Informational",status:"Draft",layer:"Applications",authors:"Gloria Zhao",year:2022,abstract:"Recommends setting nLockTime and sequence values in Taproot transactions to prevent fee-sniping attacks."},
+{num:327,title:"MuSig2 for BIP340-compatible Multi-Signatures",type:"Informational",status:"Deployed",layer:"",authors:"Jonas Nick; Tim Ruffing; Yannick Seurin",year:2020,abstract:"Defines MuSig2, a 2-round multi-signature protocol compatible with BIP-340 Schnorr signatures enabling key aggregation."},
+{num:328,title:"Derivation Scheme for MuSig2 Aggregate Keys",type:"Informational",status:"Complete",layer:"Applications",authors:"Ava Chow",year:2023,abstract:"Defines a derivation scheme for MuSig2 aggregate keys in HD wallets."},
+{num:329,title:"Wallet Labels Export Format",type:"Informational",status:"Draft",layer:"Applications",authors:"Craig Raw",year:2022,abstract:"Defines a standard JSON format for exporting wallet transaction and address labels between wallets."},
+{num:330,title:"Transaction announcements reconciliation",type:"Specification",status:"Draft",layer:"Peer Services",authors:"Gleb Naumenko; Pieter Wuille",year:2019,abstract:"Proposes an Erlay-based transaction reconciliation protocol to significantly reduce transaction relay bandwidth."},
+{num:331,title:"Ancestor Package Relay",type:"Specification",status:"Draft",layer:"Peer Services",authors:"Gloria Zhao",year:2022,abstract:"Proposes a package relay protocol to relay transactions with their ancestor packages, enabling CPFP fee bumping."},
+{num:337,title:"Compressed Transactions",type:"Specification",status:"Draft",layer:"API/RPC",authors:"Tom Briar",year:2023,abstract:"Defines a compressed transaction format for low-bandwidth transmission such as over satellite or radio."},
+{num:338,title:"Disable transaction relay message",type:"Specification",status:"Closed",layer:"Peer Services",authors:"Suhas Daftuar",year:2020,abstract:"Proposed a disabletxrelay message for establishing block-relay-only connections to improve network topology."},
+{num:339,title:"WTXID-based transaction relay",type:"Specification",status:"Deployed",layer:"Peer Services",authors:"Suhas Daftuar",year:2020,abstract:"Changes transaction relay to use the wtxid (witness transaction ID) instead of txid to properly support SegWit."},
+{num:340,title:"Schnorr Signatures for secp256k1",type:"Specification",status:"Deployed",layer:"",authors:"Pieter Wuille; Jonas Nick; Tim Ruffing",year:2020,abstract:"Defines Schnorr signatures over secp256k1, enabling key aggregation, batch verification, and improved privacy for Bitcoin."},
+{num:341,title:"Taproot: SegWit version 1 spending rules",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Pieter Wuille; Jonas Nick; Anthony Towns",year:2020,abstract:"Defines Taproot — a new SegWit v1 output type using Schnorr signatures and Merklized script trees (MAST), activated in Nov 2021."},
+{num:342,title:"Validation of Taproot Scripts",type:"Specification",status:"Deployed",layer:"Consensus (soft fork)",authors:"Pieter Wuille; Jonas Nick; Anthony Towns",year:2020,abstract:"Defines Tapscript — the scripting language for Taproot with updated opcodes, validation rules, and resource limits."},
+{num:343,title:"Mandatory activation of taproot deployment",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"Shinobius; Michael Folkson",year:2021,abstract:"Proposed mandatory miner activation of Taproot. Superseded by Speedy Trial LOT=false activation."},
+{num:345,title:"OP_VAULT",type:"Specification",status:"Closed",layer:"Consensus (soft fork)",authors:"James O'Beirne",year:2023,abstract:"Proposed OP_VAULT and OP_UNVAULT opcodes for native Bitcoin vaults with recovery mechanisms."},
+{num:346,title:"OP_TXHASH and OP_CHECKTXHASHVERIFY",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Steven Roose",year:2023,abstract:"Proposes OP_TXHASH to push the hash of specific transaction fields onto the stack, enabling covenant constructions."},
+{num:347,title:"OP_CAT in Tapscript",type:"Specification",status:"Complete",layer:"Consensus (soft fork)",authors:"Ethan Heilman; Armin Sabouri",year:2023,abstract:"Re-enables the OP_CAT opcode within Tapscript to concatenate stack elements, enabling covenants and vaults."},
+{num:348,title:"CHECKSIGFROMSTACK",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Brandon Black",year:2023,abstract:"Proposes OP_CHECKSIGFROMSTACK to verify signatures against arbitrary data, enabling stateful smart contracts."},
+{num:349,title:"OP_INTERNALKEY",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"Brandon Black",year:2023,abstract:"Proposes OP_INTERNALKEY to push the Taproot internal key onto the stack within Tapscript."},
+{num:350,title:"Bech32m format for v1+ witness addresses",type:"Specification",status:"Deployed",layer:"Applications",authors:"Pieter Wuille",year:2020,abstract:"Defines Bech32m — a modified Bech32 encoding for SegWit v1 (Taproot) and higher witness addresses fixing length extension mutation."},
+{num:351,title:"Private Payments",type:"Informational",status:"Draft",layer:"Applications",authors:"Alfred Hodler; Clark Moody",year:2022,abstract:"Proposes a privacy-enhancing payment protocol using silent-payment-style notifications for stealth addresses."},
+{num:352,title:"Silent Payments",type:"Specification",status:"Complete",layer:"Applications",authors:"Josie Baker; Ruben Somsen",year:2022,abstract:"Defines a reusable, non-interactive stealth address protocol for Bitcoin using Diffie-Hellman key exchange with no on-chain footprint."},
+{num:353,title:"DNS Payment Instructions",type:"Specification",status:"Complete",layer:"Applications",authors:"Matt Corallo",year:2024,abstract:"Defines a DNS TXT record scheme for distributing Bitcoin payment instructions including Lightning invoices and Silent Payments."},
+{num:360,title:"Pay-to-Merkle-Root (P2MR)",type:"Specification",status:"Draft",layer:"Consensus (soft fork)",authors:"moonsettler",year:2024,abstract:"Proposes a new output type Pay-to-Merkle-Root enabling flexible script trees without Taproot's key-path spend requirement."},
+{num:361,title:"Post Quantum Migration and Legacy Signature Sunset",type:"Informational",status:"Draft",layer:"Consensus (soft fork)",authors:"Hunter Beast",year:2024,abstract:"Discusses migration strategies from ECDSA to post-quantum signature schemes and sunsetting legacy address types."},
+{num:370,title:"PSBT Version 2",type:"Specification",status:"Deployed",layer:"Applications",authors:"Andrew Chow",year:2020,abstract:"Defines PSBT version 2 with additional global fields and the ability to construct new transactions from scratch."},
+{num:371,title:"Taproot Fields for PSBT",type:"Specification",status:"Deployed",layer:"Applications",authors:"Andrew Chow",year:2021,abstract:"Adds Taproot-specific fields (key paths, leaf scripts, control blocks) to the PSBT format (BIP-174 and BIP-370)."},
+{num:372,title:"PSBT Extensions for Post-Quantum",type:"Specification",status:"Draft",layer:"Applications",authors:"Ava Chow",year:2024,abstract:"Proposes PSBT field extensions to support post-quantum signature schemes."},
+{num:373,title:"MuSig2 Fields for PSBT",type:"Specification",status:"Draft",layer:"Applications",authors:"Ava Chow",year:2023,abstract:"Adds MuSig2-specific fields to PSBT for coordinating multi-signature signing rounds."},
+{num:374,title:"PSBT DLEQ Proofs",type:"Specification",status:"Draft",layer:"Applications",authors:"Andrew Toth; Ethan Heilman",year:2024,abstract:"Adds discrete log equality proof fields to PSBT for verifying key ownership in signing workflows."},
+{num:375,title:"PSBT for Silent Payments",type:"Specification",status:"Draft",layer:"Applications",authors:"Andrew Toth; Josie Baker",year:2024,abstract:"Extends PSBT with fields for constructing and signing Silent Payment transactions (BIP-352)."},
+{num:380,title:"Output Script Descriptors General Operation",type:"Informational",status:"Deployed",layer:"Applications",authors:"Pieter Wuille; Andrew Chow",year:2021,abstract:"Defines the general syntax and semantics of output script descriptors for wallet software."},
+{num:381,title:"Non-Segwit Output Script Descriptors",type:"Informational",status:"Deployed",layer:"Applications",authors:"Pieter Wuille; Andrew Chow",year:2021,abstract:"Defines pk(), pkh(), and sh() output script descriptor functions for non-SegWit scripts."},
+{num:382,title:"Segwit Output Script Descriptors",type:"Informational",status:"Deployed",layer:"Applications",authors:"Pieter Wuille; Andrew Chow",year:2021,abstract:"Defines wpkh() and wsh() output script descriptor functions for native SegWit scripts."},
+{num:383,title:"Multisig Output Script Descriptors",type:"Informational",status:"Deployed",layer:"Applications",authors:"Pieter Wuille; Andrew Chow",year:2021,abstract:"Defines multi() and sortedmulti() descriptor functions for multisig output scripts."},
+{num:384,title:"Combo Output Script Descriptors",type:"Informational",status:"Deployed",layer:"Applications",authors:"Pieter Wuille; Andrew Chow",year:2021,abstract:"Defines combo() descriptor function for backwards-compatible handling of P2PK, P2PKH, P2WPKH, and P2SH-P2WPKH."},
+{num:385,title:"Raw and Addr Output Script Descriptors",type:"Informational",status:"Deployed",layer:"Applications",authors:"Pieter Wuille; Andrew Chow",year:2021,abstract:"Defines raw() and addr() descriptor functions for arbitrary scripts and known address types."},
+{num:386,title:"tr() Output Script Descriptors",type:"Informational",status:"Deployed",layer:"Applications",authors:"Pieter Wuille; Andrew Chow",year:2021,abstract:"Defines the tr() descriptor function for Taproot output scripts with key paths and Merkle script trees."},
+{num:387,title:"Taproot Key Expression in Descriptors",type:"Informational",status:"Draft",layer:"Applications",authors:"Ava Chow",year:2022,abstract:"Defines key expression syntax for Taproot descriptors, including x-only keys and derivation paths."},
+{num:388,title:"Wallet Policies for Descriptor Wallets",type:"Informational",status:"Draft",layer:"Applications",authors:"Salvatore Ingala",year:2022,abstract:"Defines wallet policies — a simplified descriptor format optimized for hardware signing devices."},
+{num:389,title:"Multipath Descriptor Key Expressions",type:"Informational",status:"Draft",layer:"Applications",authors:"Ava Chow",year:2023,abstract:"Defines a multipath syntax (<0;1>) in descriptor key expressions for receive and change address chains."},
+{num:390,title:"Contexts in Descriptor Expressions",type:"Informational",status:"Draft",layer:"Applications",authors:"Ava Chow",year:2024,abstract:"Proposes adding context information to descriptor expressions for improved validation."}
+];
+
+let currentFilter='all',currentSort={col:'num',dir:1},currentSearch='';
+function statusClass(s){return 'status status-'+s.replace(/\s/g,'')}
+function renderTable(){
+  const tbody=document.getElementById('bipBody'),empty=document.getElementById('emptyMsg');
+  let data=[...BIPS];
+  if(currentFilter!=='all') data=data.filter(b=>b.status===currentFilter);
+  if(currentSearch){const q=currentSearch.toLowerCase();data=data.filter(b=>String(b.num).includes(q)||b.title.toLowerCase().includes(q)||b.authors.toLowerCase().includes(q)||b.type.toLowerCase().includes(q)||b.status.toLowerCase().includes(q)||b.layer.toLowerCase().includes(q))}
+  data.sort((a,b)=>{let va=a[currentSort.col],vb=b[currentSort.col];if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase()}return currentSort.dir*(va<vb?-1:va>vb?1:0)});
+  tbody.innerHTML='';
+  if(!data.length){empty.style.display='block';return}
+  empty.style.display='none';
+  data.forEach((b,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><span class="bip-num">BIP-${String(b.num).padStart(4,'0')}</span></td><td><span class="bip-title"><a href="https://bips.xyz/${b.num}" target="_blank" onclick="event.stopPropagation()">${b.title}</a></span></td><td><span class="type">${b.type}</span></td><td><span class="${statusClass(b.status)}">${b.status.toUpperCase()}</span></td><td class="col-layer"><span class="bip-layer">${b.layer||'—'}</span></td><td class="col-authors"><span class="bip-authors" title="${b.authors}">${b.authors}</span></td><td class="col-year"><span class="bip-year">${b.year}</span></td>`;
+    tr.addEventListener('click',()=>openModal(b));
+    tbody.appendChild(tr);
+  });
+  document.getElementById('totalCount').textContent=BIPS.length;
+  document.getElementById('deployedCount').textContent=BIPS.filter(b=>b.status==='Deployed').length;
+  document.getElementById('draftCount').textContent=BIPS.filter(b=>b.status==='Draft').length;
+  document.getElementById('completeCount').textContent=BIPS.filter(b=>b.status==='Complete').length;
+}
+document.querySelectorAll('thead th[data-col]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const col=th.dataset.col;
+    if(currentSort.col===col)currentSort.dir*=-1;else{currentSort.col=col;currentSort.dir=1}
+    document.querySelectorAll('thead th').forEach(t=>{t.classList.remove('sorted');t.querySelector('.sort-icon').textContent='&#8645;'});
+    th.classList.add('sorted');th.querySelector('.sort-icon').textContent=currentSort.dir===1?'↑':'↓';
+    renderTable();
+  });
+});
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');currentFilter=btn.dataset.filter;renderTable();
+  });
+});
+document.getElementById('searchInput').addEventListener('input',e=>{currentSearch=e.target.value.trim();renderTable()});
+function openModal(b){
+  document.getElementById('mBip').textContent=`BIP-${String(b.num).padStart(4,'0')}`;
+  document.getElementById('mTitle').textContent=b.title;
+  document.getElementById('mStatus').innerHTML=`<span class="${statusClass(b.status)}">${b.status.toUpperCase()}</span>`;
+  document.getElementById('mType').textContent=b.type;
+  document.getElementById('mLayer').textContent=b.layer||'—';
+  document.getElementById('mYear').textContent=b.year;
+  document.getElementById('mAuthors').textContent=b.authors;
+  document.getElementById('mAbstract').textContent=b.abstract;
+  document.getElementById('mLink').href=`https://bips.xyz/${b.num}`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e){if(e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('modalOverlay').classList.remove('open')});
+renderTable();
+</script>
+</body>
+</html>
